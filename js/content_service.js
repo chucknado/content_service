@@ -3,7 +3,7 @@
 
 function insert_service_content() {
   const catalog_url = 'https://cdn.jsdelivr.net/gh/chucknado/content_service@main/content/catalog.json';
-  const catalog = JSON.parse(get_file(catalog_url));
+  const catalog = get_file(catalog_url);
   console.log(catalog);
   // read all the elements with class "content_ph"
   // read the "data-conref" attribute of each element to get the id of the content
