@@ -1,34 +1,36 @@
-/* Inserts service content in the page */
+function insert_content() {
+  const root = 'https://cdn.jsdelivr.net/gh/chucknado/content_service@latest/content/';
 
+  const placeholders = document.getElementsByClassName('content_ph');
+  for (var i = 0; i < placeholders.length; i++) {
+    let ph = placeholders[i];
+    let conref = ph.getAttribute('data-conref');
+    let locale = ph.getAttribute('data-locale');
+    let content_url = root + conref + '.html';
+    // let content_url = root + locale + '/' + conref + '.html';  // with locale
 
-function insert_service_content() {
-  const catalog_url = 'https://cdn.jsdelivr.net/gh/chucknado/content_service@main/content/catalog.json';
-  const catalog = get_file(catalog_url);
-  console.log(catalog);
-  // read all the elements with class "content_ph"
-  // read the "data-conref" attribute of each element to get the id of the content
-  // use the id to look up the content url in the catalog
-  // get the content
-  // insert the content at the placeholder
-}
-
-
-function get_file(url) {
-  const request = new XMLHttpRequest();
-  request.onreadystatechange = handleResponse;
-  request.open('GET', url);
-  request.send();
-
-  function handleResponse() {
-    if (request.readyState === XMLHttpRequest.DONE) {
-      if (request.status === 200) {
-        return request.response;
-      } else {
-        console.log('There was a problem with the request - ' + request.status);
+    let promise = new Promise(function(resolve, reject) {
+      function reqListener() {
+        if (this.status === 200) {
+          resolve(this.responseText);
+        } else {
+          reject(Error(this.status));
+        }
       }
-    }
+      let request = new XMLHttpRequest();
+      request.addEventListener("load", reqListener);
+      request.open("GET", content_url);
+      request.send();
+    });
+
+    promise.then(function(content) {
+      // insert content in div
+      ph.innerHTML = content;
+    }).catch(function(error) {
+      ph.innerHTML = 'This content is currently not available.';
+      console.log(error);
+    });
   }
 }
 
-
-window.addEventListener('load', insert_service_content, false);
+window.addEventListener('load', insert_content, false);
